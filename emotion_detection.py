@@ -2,7 +2,7 @@
 Module for detecting emotions in text using Watson NLP API. 
 """
 import requests
-
+import json
 def emotion_detector(text_to_analyze):
     """
     Anaalyze the emotions of a given text using API
@@ -20,7 +20,33 @@ def emotion_detector(text_to_analyze):
             "text": text_to_analyze 
         } 
     }
-
     response = requests.post(url, json=myobj, headers=headers, timeout=10)
-
-    return response.text
+    # 1. make a dict
+    formatted_response = json.loads(response.text)
+    # 2. Pulling exact emotions
+    emotions = formatted_response['emotionPredictions'][0]['emotion']
+    anger_score = emotions['anger']
+    disgust_score = emotions['disgust']
+    fear_score= emotions['fear']
+    joy_score = emotions['joy']
+    sadness_score = emotions['sadness']
+    # 3. Finding most dominant emotion
+    # dict with only results for easier max finding
+    emotion_list = {
+        'anger': anger_score,
+        'disgust': disgust_score,
+        'fear': fear_score,
+        'joy': joy_score,
+        'sadness': sadness_score
+    }
+    # max() will check values but return a key
+    dominant_emotion = max(emotion_list, key=emotion_list.get)
+    return {
+        'anger': anger_score,
+        'disgust': disgust_score,
+        'fear': fear_score,
+        'joy': joy_score,
+        'sadness': sadness_score,
+        'dominant_emotion': dominant_emotion
+    }
+    
