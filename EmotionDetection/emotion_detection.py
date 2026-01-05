@@ -21,10 +21,23 @@ def emotion_detector(text_to_analyze):
         } 
     }
     response = requests.post(url, json=myobj, headers=headers, timeout=10)
+
+    # error 400 hendling
+    if response.status_code == 400:
+        return {
+            'anger': None,
+            'disgust': None,
+            'fear': None,
+            'joy': None,
+            'sadness': None,
+            'dominant_emotion': None
+        }
+        
     # 1. make a dict
     formatted_response = json.loads(response.text)
     # 2. Pulling exact emotions
     emotions = formatted_response['emotionPredictions'][0]['emotion']
+
     anger_score = emotions['anger']
     disgust_score = emotions['disgust']
     fear_score= emotions['fear']
@@ -41,6 +54,8 @@ def emotion_detector(text_to_analyze):
     }
     # max() will check values but return a key
     dominant_emotion = max(emotion_list, key=emotion_list.get)
+
+
     return {
         'anger': anger_score,
         'disgust': disgust_score,
